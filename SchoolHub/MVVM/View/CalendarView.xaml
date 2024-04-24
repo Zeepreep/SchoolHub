@@ -1,0 +1,197 @@
+﻿<UserControl x:Class="SchoolHub.MVVM.View.CalendarView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:SchoolHub.MVVM.View"
+             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+             xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
+             xmlns:visualBasic="clr-namespace:Microsoft.VisualBasic;assembly=Microsoft.VisualBasic.Core"
+             xmlns:global="clr-namespace:"
+             mc:Ignorable="d"
+             d:DesignHeight="600" d:DesignWidth="920"
+             Background="#FFFFFF">
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Theme/NavigationButtonTheme.xaml" />
+                <ResourceDictionary Source="/Theme/InputBoxTheme.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+            <global:RemindersToStringConverter x:Key="RemindersToStringConverter" />
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <StackPanel Margin="75, 20, 75, 25" Background="#FFFFFF">
+        <TextBlock Text="{Binding CurrentMonthYear}"
+                   Foreground="Black"
+                   FontSize="32"
+                   HorizontalAlignment="Left"
+                   Margin="0,0,0,10" />
+
+        <Rectangle Height="1" Fill="Black" HorizontalAlignment="Stretch" Margin="0,0,0,0" />
+
+        <StackPanel Orientation="Horizontal"
+                    Margin="0,10,0,10">
+
+            <Button Content="Previous Month"
+                    Style="{StaticResource NavigationButtonTheme}"
+                    Command="{Binding PreviousMonthCommand}"
+                    Width="120" Height="35"
+                    FontSize="12"
+                    VerticalAlignment="Top"
+                    Margin="5, 0, 0 , 0" />
+
+            <Button Content="Next Month"
+                    Style="{StaticResource NavigationButtonTheme}"
+                    Command="{Binding NextMonthCommand}"
+                    Width="120" Height="35"
+                    FontSize="12"
+                    VerticalAlignment="Top"
+                    Margin="15, 0, 10 , 0" />
+
+
+            <StackPanel Orientation="Vertical">
+                <TextBlock Text="Upcoming Reminders"
+                           Margin="20, 0, 0 , 5"
+                           FontFamily="SST" 
+                           FontWeight="Bold" />
+
+                <Border Style="{StaticResource InputBoxTheme}" Height="80" Width="500">
+                    <ListBox ItemsSource="{Binding SortedAndFilteredReminders}"
+                             Height="80"
+                             BorderThickness="0"
+                             VerticalAlignment="Center"
+                             Margin="5"
+                             Padding="0, 5, 0, 0">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock>
+                                    <TextBlock.Text>
+                                        <MultiBinding StringFormat="{}{0} ({1:dd/MM/yyyy})">
+                                            <Binding Path="ReminderText" />
+                                            <Binding Path="Date" />
+                                        </MultiBinding>
+                                    </TextBlock.Text>
+                                </TextBlock>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </Border>
+            </StackPanel>
+        </StackPanel>
+
+        <Rectangle Height="1" Fill="Black" Width="265" HorizontalAlignment="Left" Margin="0,-70,0,15" />
+
+
+        <ItemsControl x:Name="Calendar" ItemsSource="{Binding Days}">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <UniformGrid Rows="5"
+                                 Columns="7"
+                                 Margin="0, 25, 0, 0" />
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Border BorderBrush="Black" BorderThickness="1" CornerRadius="5">
+                        <Grid Background="{Binding IsToday, Converter={StaticResource BooleanToColorConverter}}">
+                            <StackPanel>
+                                <i:Interaction.Triggers>
+                                    <i:EventTrigger EventName="MouseLeftButtonUp">
+                                        <i:InvokeCommandAction
+                                            Command="{Binding DataContext.DayClickedCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                            CommandParameter="{Binding Day}" />
+                                    </i:EventTrigger>
+                                </i:Interaction.Triggers>
+                                <TextBlock Text="{Binding Day}" Foreground="Black" VerticalAlignment="Center"
+                                           HorizontalAlignment="Center" />
+                                <ListBox ItemsSource="{Binding Reminders}"
+                                         SelectedItem="{Binding DataContext.SelectedReminder, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                         Height="50">
+                                    <ListBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding ReminderText}" Foreground="Black">
+                                                <i:Interaction.Triggers>
+                                                    <i:EventTrigger EventName="MouseLeftButtonUp">
+                                                        <i:InvokeCommandAction
+                                                            Command="{Binding DataContext.EditReminderCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                            CommandParameter="{Binding}" />
+                                                    </i:EventTrigger>
+                                                </i:Interaction.Triggers>
+                                            </TextBlock>
+                                        </DataTemplate>
+                                    </ListBox.ItemTemplate>
+                                </ListBox>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+
+        <Grid x:Name="ReminderMenu"
+              Visibility="{Binding IsReminderMenuVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <StackPanel>
+                <Label Content="Reminder:" />
+
+                <Border Style="{StaticResource InputBoxTheme}">
+                    <TextBox x:Name="ReminderTextBox"
+                             Text="{Binding ReminderText, UpdateSourceTrigger=PropertyChanged}"
+                             VerticalAlignment="Center"
+                             Margin="5, 0, 5, 0"
+                             BorderThickness="0" />
+                </Border>
+
+                <Label Content="Date:" />
+
+                <Border Style="{StaticResource InputBoxTheme}">
+                    <DatePicker x:Name="ReminderDatePicker"
+                                SelectedDate="{Binding ReminderDate, UpdateSourceTrigger=PropertyChanged}"
+                                VerticalAlignment="Center"
+                                Margin="5, 0, 5, 0"
+                                BorderThickness="0" />
+                </Border>
+
+                <StackPanel Orientation="Horizontal" Margin="0, 15, 0, 0">
+                    <Button Content="Add Reminder"
+                            Command="{Binding AddReminderCommand}"
+                            Style="{StaticResource NavigationButtonTheme}"
+                            Width="120" Height="35"
+                            FontSize="12"
+                            Margin="5, 0, 0 , 0" />
+
+                    <Button Content="Remove Reminder"
+                            Command="{Binding RemoveReminderCommand}"
+                            Style="{StaticResource NavigationButtonTheme}"
+                            Width="120" Height="35"
+                            FontSize="12"
+                            Margin="15, 0, 0 , 0"
+                            Visibility="{Binding IsEditingReminder, Converter={StaticResource BooleanToVisibilityConverter}}" />
+
+                    <Button Content="Close"
+                            Command="{Binding ToggleReminderMenuCommand}"
+                            Style="{StaticResource NavigationButtonTheme}"
+                            Width="120" Height="35"
+                            FontSize="12"
+                            Margin="15, 0, 0 , 0" />
+                </StackPanel>
+            </StackPanel>
+        </Grid>
+
+        <TextBlock>
+            <TextBlock.Text>
+                <MultiBinding StringFormat="{}{0} ({1})">
+                    <Binding Path="Day" />
+                    <Binding Path="Reminders" Converter="{StaticResource RemindersToStringConverter}" />
+                </MultiBinding>
+            </TextBlock.Text>
+            <TextBlock.Background>
+                <Binding Path="IsToday" Converter="{StaticResource BooleanToColorConverter}" />
+            </TextBlock.Background>
+        </TextBlock>
+    </StackPanel>
+</UserControl>

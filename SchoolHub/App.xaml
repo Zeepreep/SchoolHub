@@ -1,0 +1,40 @@
+﻿<Application x:Class="SchoolHub.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:SchoolHub"
+             xmlns:viewModel="clr-namespace:SchoolHub.MVVM.ViewModel"
+             xmlns:view="clr-namespace:SchoolHub.MVVM.View"
+             xmlns:converters="clr-namespace:SchoolHub.MVVM.Converters"
+
+             Startup="Application_Startup"
+             >
+    <Application.Resources>
+         <ResourceDictionary>
+             <ResourceDictionary.MergedDictionaries>
+                 <ResourceDictionary Source="Theme/MenuButtonTheme.xaml"/>
+                 <ResourceDictionary Source="Theme/TextBoxTheme.xaml"/>
+             </ResourceDictionary.MergedDictionaries>
+             
+             <DataTemplate DataType="{x:Type viewModel:HomeViewModel}">
+                 <view:HomeView/>
+             </DataTemplate>
+             
+             <DataTemplate DataType="{x:Type viewModel:CalendarViewModel}">
+                 <view:CalendarView/>
+             </DataTemplate>
+             
+             <DataTemplate DataType="{x:Type viewModel:AssignmentsViewModel}">
+                 <view:AssignmentsView/>
+             </DataTemplate>
+             
+             <DataTemplate DataType="{x:Type viewModel:PomodoroViewModel}">
+                 <view:PomodoroView/>
+             </DataTemplate>
+             
+             <viewModel:ViewModelLocator x:Key="ViewModelLocator" />
+             
+             <converters:BooleanToColorConverter x:Key="BooleanToColorConverter" />
+             
+         </ResourceDictionary>
+    </Application.Resources>
+</Application>

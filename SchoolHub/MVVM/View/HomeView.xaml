@@ -1,0 +1,96 @@
+﻿<UserControl x:Class="SchoolHub.MVVM.View.HomeView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:SchoolHub.MVVM.View"
+             mc:Ignorable="d"
+             d:DesignHeight="700" d:DesignWidth="920">
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Theme/NavigationButtonTheme.xaml" />
+                <ResourceDictionary Source="/Theme/InputBoxTheme.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <Grid Name="HomeScreenGrid">
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="60" />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Background="#FFB300" />
+
+        <StackPanel Grid.Row="1" Background="#FFFFFF">
+            <TextBlock Text="Home"
+                       FontFamily="SST"
+                       FontWeight="Bold"
+                       Foreground="Black"
+                       FontSize="32"
+                       HorizontalAlignment="Left"
+                       Margin="75,40,0,0" />
+
+            <Rectangle Height="1" Fill="Black" HorizontalAlignment="Stretch" Margin="75,0,0,0" />
+
+            <StackPanel Orientation="Horizontal">
+
+                <StackPanel Orientation="Vertical"
+                            Margin="75,30,0,10">
+
+                    <Button Content="Assignments"
+                            Style="{StaticResource NavigationButtonTheme}"
+                            Command="{Binding AssignmentViewCommand}" />
+
+
+                    <Rectangle Height="1" Fill="Black" Width="400" HorizontalAlignment="Left" Margin="0,25,0,0" />
+
+                    <Button Content="Tools"
+                            Margin="0,25,0,0"
+                            Style="{StaticResource NavigationButtonTheme}"
+                            Command="{Binding PomodoroViewCommand}" />
+
+                    <Rectangle Height="1" Fill="Black" Width="400" HorizontalAlignment="Left" Margin="0,25,0,0" />
+
+                    <Button Content="Calendar"
+                            Margin="0,25,0,0"
+                            Style="{StaticResource NavigationButtonTheme}"
+                            Command="{Binding CalendarViewCommand}" />
+                </StackPanel>
+
+                <StackPanel Orientation="Vertical">
+                    <TextBlock Text="Upcoming Reminders"
+                               Margin="20, 0, 0 , 5"
+                               FontFamily="SST"
+                               FontWeight="Bold" />
+
+                    <Border Style="{StaticResource InputBoxTheme}" Height="80" Width="300">
+                        <ListBox ItemsSource="{Binding CalendarVM.SortedAndFilteredReminders}"
+                                 Height="80"
+                                 BorderThickness="0"
+                                 VerticalAlignment="Center"
+                                 Margin="5"
+                                 Padding="0, 5, 0, 0">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock>
+                                        <TextBlock.Text>
+                                            <MultiBinding StringFormat="{}{0} ({1:dd/MM/yyyy})">
+                                                <Binding Path="ReminderText" />
+                                                <Binding Path="Date" />
+                                            </MultiBinding>
+                                        </TextBlock.Text>
+                                    </TextBlock>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </Border>
+                </StackPanel>
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+
+</UserControl>
